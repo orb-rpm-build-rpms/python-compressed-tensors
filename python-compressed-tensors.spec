@@ -24,9 +24,10 @@ Summary:        %{summary}
 
 %description -n python3-compressed-tensors %_description
 
-# For official Fedora packages, review which extras should be actually packaged
-# See: https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#Extras
-%pyproject_extras_subpkg -n python3-compressed-tensors accelerate,dev
+# The "dev" extra is lint/test tooling (black==22.12, isort==5.8, flake8,
+# pytest, nbconvert, accelerate) and "accelerate" pulls the accelerate library;
+# neither is packaged here and neither is needed to build or import the module,
+# so no extras subpackages are built.
 
 
 %prep
@@ -34,8 +35,9 @@ Summary:        %{summary}
 
 
 %generate_buildrequires
-# Keep only those extras which you actually want to package or use during tests
-%pyproject_buildrequires -x accelerate,dev
+# Core runtime deps only (torch, transformers, pydantic, loguru); the dev and
+# accelerate extras are excluded -- see the extras note above.
+%pyproject_buildrequires
 
 
 %build
