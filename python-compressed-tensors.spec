@@ -11,6 +11,10 @@ Source:         %{pypi_source compressed_tensors}
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+# psutil is imported at top level by compressed_tensors.offload.load but is not
+# declared in the project's dependencies, so the dependency generator misses it.
+# Required both to satisfy the build-time import check and at runtime.
+BuildRequires:  python3-psutil
 
 
 # Fill in the actual package description to submit package to Fedora
@@ -21,6 +25,8 @@ This is package 'compressed-tensors' generated automatically by pyp2spec.}
 
 %package -n     python3-compressed-tensors
 Summary:        %{summary}
+# Undeclared upstream runtime dependency (see BuildRequires note).
+Requires:       python3-psutil
 
 %description -n python3-compressed-tensors %_description
 
