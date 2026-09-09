@@ -8,6 +8,10 @@ Summary:        Library for utilization of compressed safetensors of neural netw
 License:        ...
 URL:            https://github.com/vllm-project/compressed-tensors
 Source:         %{pypi_source compressed_tensors}
+# Make the @torch.compile decorator degrade to eager execution when
+# torch.compile is unsupported (Fedora's torch raises on Python 3.15+),
+# otherwise the package is unimportable. Applied by %autosetup -p1.
+Patch0:         0001-safe-torch-compile.patch
 
 BuildArch:      noarch
 BuildRequires:  python3-devel

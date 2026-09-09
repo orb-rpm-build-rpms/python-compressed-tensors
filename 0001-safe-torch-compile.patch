@@ -1,0 +1,41 @@
+From: vLLM Fedora packaging
+Subject: [PATCH] Degrade @torch.compile to eager when unsupported
+
+FP4_E2M1_DATA.cast_to_fp4 is decorated with @torch.compile, which runs at
+import time. On some interpreters torch.compile raises unconditionally
+(RuntimeError: "torch.compile is not supported on Python 3.15+" with the torch
+build shipped in Fedora), which makes the whole compressed_tensors package
+unimportable. The helper is numerically correct when run eagerly, so fall back
+to the uncompiled function instead of failing at import.
+
+--- a/src/compressed_tensors/quantization/quant_args.py
++++ b/src/compressed_tensors/quantization/quant_args.py
+@@ -18,6 +18,19 @@
+ )
+
+
++def _safe_compile(fn):
++    """Apply torch.compile, falling back to the eager function if unsupported.
++
++    torch.compile raises on some interpreters (RuntimeError on Python 3.15+).
++    The decorated helpers are correct when run eagerly, so degrade to the
++    uncompiled function instead of failing at import time.
++    """
++    try:
++        return torch.compile(fn)
++    except Exception:
++        return fn
++
++
+ __all__ = [
+     "FP8_E4M3_DATA",
+     "FP4_E2M1_DATA",
+@@ -53,7 +66,7 @@
+     min = -6.0
+
+     @staticmethod
+-    @torch.compile
++    @_safe_compile
+     def cast_to_fp4(x):
+         sign = torch.sign(x)
+         x = torch.abs(x)
