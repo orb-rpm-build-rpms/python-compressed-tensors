@@ -10,7 +10,7 @@ URL:            https://github.com/vllm-project/compressed-tensors
 Source:         %{pypi_source compressed_tensors}
 # Make the @torch.compile decorator degrade to eager execution when
 # torch.compile is unsupported (Fedora's torch raises on Python 3.15+),
-# otherwise the package is unimportable. Applied by %autosetup -p1.
+# otherwise the package is unimportable. Applied automatically during prep.
 Patch0:         0001-safe-torch-compile.patch
 
 BuildArch:      noarch
